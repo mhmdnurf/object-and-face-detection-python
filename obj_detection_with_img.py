@@ -1,8 +1,7 @@
 import cv2
 
-
 thres = 0.45  # Threshold to detect object
-img = cv2.imread("human_with_cat.jpg", cv2.IMREAD_UNCHANGED)
+img = cv2.imread("tools.jpg", cv2.IMREAD_UNCHANGED)
 width = 960
 height = 540
 dim = (width, height)
