@@ -1,6 +1,9 @@
+# Untuk memanggil library yang digunakan pada codingan ini, karena menggunakan opencv maka syntax nya import cv2
 import cv2
 
-thres = 0.45  # Threshold to detect object
+#
+thres = 0.5  # Threshold to detect object
+
 img = cv2.imread("tools.jpg", cv2.IMREAD_UNCHANGED)
 width = 960
 height = 540
