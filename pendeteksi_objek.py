@@ -1,66 +1,52 @@
-# Importing the OpenCV library.
-import cv2 as cv
+import cv2 as cv #untuk mengimport library dari OpenCV
 
-# The threshold for the confidence of the object detection.
-thres = 0.45
+thres = 0.5 #ambang batas untuk membatasi program dalam mendeteksi objek
 
-# Using the default webcam.
-cap = cv.VideoCapture(0)
+cap = cv.VideoCapture(0) #untuk menentukan program agar menggunakan webcam default laptop
 
-# Creating an empty list.
-classNames = []
+# cap.set(10,50)
 
-# A file that contains the names of the objects that the model can detect.
-classFile = "coco.names"
-# Reading the file and splitting it into a list.
+classNames = [] #array kosong yang nantinya diisi oleh nama nama objek.
+
+classFile = "coco.names" #untuk mengisi file yang terdapat nama nama objek yang dapat dideteksi oleh program.
+
 with open(classFile, "rt") as f:
-    classNames = f.read().rstrip("\n").split("\n")
+    classNames = f.read().rstrip("\n").split("\n") #untuk membaca file dan diubah kedalam bentuk list.
 
-# The path to the configuration file of the model.
-configPath = "ssd_mobilenet_v3_large_coco_2020_01_14.pbtxt"
+configPath = "ssd_mobilenet_v3_large_coco_2020_01_14.pbtxt" #path atau jalur untuk file model konfigurasinya.
 
-# The path to the weights file of the model.
-weightsPath = "frozen_inference_graph.pb"
+weightsPath = "frozen_inference_graph.pb" #path atau jalur untuk file weight konfigurasinya. 
 
-# Loading the model.
-net = cv.dnn_DetectionModel(weightsPath, configPath)
+net = cv.dnn_DetectionModel(weightsPath, configPath) #untuk memproses dan mendeteksi file konfigurasinya.
 
-# Setting the input size of the model.
-net.setInputSize(320, 320)
+net.setInputSize(320, 320) #untuk mengatur lebar dan tinggi dari pendeteksi nya.
 
-# Normalizing the input image.
-net.setInputScale(1.0 / 127.5)
+#Normalizing the input image.
+net.setInputScale(1 / 127.5)
 
-
-# This is the main loop of the program. It reads the image from the camera, flips it and detects the objects.
-while True:
-    success, img = cap.read()
-    img = cv.flip(img, 1)
-    resize = cv.resize(img, (1366, 705))
-    classIds, confs, bbox = net.detect(resize, confThreshold=thres)
-    print(classIds, bbox)
-
-    # Drawing the bounding boxes around the detected objects.
-    # Checking if the model has detected any objects.
-    if len(classIds) != 0:
-        # Drawing the bounding boxes around the detected objects.
-        for classId, confidence, box in zip(classIds.flatten(), confs.flatten(), bbox):
-            cv.rectangle(resize, box, color=(153, 255, 255), thickness=1)
-            # Drawing the name of the detected object on the image.
-            cv.putText(
-                resize,
-                classNames[classId - 1].upper(),
-                (box[0] + 10, box[1] + 30),
-                cv.FONT_HERSHEY_COMPLEX,
-                1,
-                (153, 255, 255),
-                2,
-            )
-
-    # Showing the image.
-    cv.imshow("Pendeteksi Objek", resize)
+while True: #jika kondisi benar atau sesuai maka akan dijalankan codingan dibawahnya.
     
-    # Checking if the user has pressed the escape key. If the user has pressed the escape key, the program will exit.
-    if cv.waitKey(1) == 27:
-        break
-    #END
+    ret, img = cap.read() #untuk membaca camera yang akan ditampilkan ke layar
+    
+    img = cv.flip(img, 3) #untuk membalikkan tampilan dari camera menjadi mirror seperti kamera selfie, nilai 0 untuk membalik sumbu-x, nilai 1 untuk membalik sumbu-y.
+
+    resize = cv.resize(img, (640, 480)) #untuk mengatur resolusi yang ditampilkan pada camera, value pertama untuk mengatur lebar, value kedua untuk mengatur tinggi.
+
+
+    classIds, confs, bbox = net.detect(resize, confThreshold=thres) #untuk mendeteksi objek yang tampil di kamera dan confThreshold merupakan ambang batas yang terdapat pada variabel thres.
+
+    print(classIds, bbox) #untuk mencetak/merekam variabel classIds dan bbox yang terdapat pada codingan di atas.
+
+    if len(classIds) != 0: #len digunakan untuk menghitung jumlah dari objek classIds,jika nilai != 0, maka for looping dibawahnya akan dijalankan.
+
+        # Drawing the bounding boxes around the detected objects.
+        for classId, confidence, box in zip(classIds.flatten(), confs.flatten(), bbox): #
+
+            cv.rectangle(resize, box, (153, 255, 255),3) #untuk membuat persegi di daerah wajah yang terdeteksi dimana value angka diisi oleh format GBR untuk warna dari perseginya. Dan nilai 1 setelah value GBR berfungsi untuk mengatur ketebalan dari garis atau sisi perseginya.
+    
+            cv.putText(resize,classNames[classId - 1].upper(), (box[0] + 10,box[1] + 30),cv.FONT_HERSHEY_COMPLEX,1,(153, 255, 255),2) #untuk menampilkan tulisan objek yang terdeteksi 
+
+    cv.imshow("Pendeteksi Objek", resize) #untuk menampilkan camera
+
+    if cv.waitKey(1) == 27: #waitKey dengan nilai 1 untuk memberikan delay sebesar 1ms terhadap gerakan yang dilakukan didepan camera,dan akan berhenti ketika tombol ESC ditekan. nilai 27 = ESC diambil dari ASCII yaitu American Standard Code for Information Interchange dimana nilai 27 = ESC.
+        break #setelah ESC ditekan, looping akan berhenti dan camera akan mati.
